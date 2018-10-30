@@ -1,29 +1,62 @@
 import React, { Component } from "react";
 import "./App.css";
+
 import CharacterCard from "./components/CharacterCard";
+import MovieCard from "./components/MovieCard";
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      data: []
+      data: [],
+      movieData: [],
+      loaded: false
     };
   }
 
   componentWillMount() {
     fetch("https://ghibliapi.herokuapp.com/people/")
-      .then(responce => responce.json())
-      .then(responce => {
+      .then(response => response.json())
+      .then(response => {
         this.setState({
-          data: responce
+          data: response
         });
       });
   }
 
+  handleClick = url => {
+    console.log(url);
+    fetch(url)
+      .then(response => response.json())
+      .then(response => {
+        this.setState({
+          movieData: response,
+          loaded: true
+        });
+      });
+  };
+  handleOtherClick = () => {
+    this.setState({
+      loaded: false
+    });
+  };
+
   render() {
     return (
       <div className="App">
-        <CharacterCard data={this.state.data} />
+        {this.state.loaded ? (
+          <div className="movie">
+            <MovieCard
+              movieData={this.state.movieData}
+              handleOtherClick={this.handleOtherClick}
+            />
+          </div>
+        ) : (
+          <CharacterCard
+            handleClick={this.handleClick}
+            data={this.state.data}
+          />
+        )}
       </div>
     );
   }
